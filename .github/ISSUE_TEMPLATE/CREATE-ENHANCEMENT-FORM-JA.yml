@@ -1,0 +1,53 @@
+name: Create Enhancement Issue (ja)
+description: Enhancement Issue Template (ja)
+labels: [ "enhancement" ]
+body:
+  - type: markdown
+    attributes:
+      value: "## 基本設定"
+  - type: markdown
+    attributes:
+      value: |
+        このIssueの概要や目的について、できるだけ詳細に記述してください
+  - type: input
+    id: overview
+    attributes:
+      label: Overview
+      description: |
+        このIssueの概要について記載してください
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Purpose
+      description: |
+        このIssueの目的や、解決することでユーザが実現できるようになることを記載してください
+      value: |
+        - XXX
+    validations:
+      required: true
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+      description: |
+        このIssueを解決するために必要な作業を入力してください
+      value: |
+        - [ ] XXX
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: "## 自動化設定"
+  - type: input
+    id: branch-name
+    attributes:
+      # 以下のlabelはcreate-branch workflowによってブランチ名を取得するために使用される
+      label: Branch Name
+      description: |
+        Issueに関連付けられるBranchの名前を入力してください
+        実際のBranch名には、ラベルに応じた接頭辞とIssueの番号が付加されます
+        Branchの命名規則は[XXX]()を参照してください
+    validations:
+      required: true
