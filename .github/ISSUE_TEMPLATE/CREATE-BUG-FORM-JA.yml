@@ -28,6 +28,12 @@ body:
     validations:
       required: true
   - type: textarea
+    id: proposal
+    attributes:
+      label: Design Proposal
+      description: |
+        このIssueの設計およびそれを選択した理由について記載してください
+  - type: textarea
     id: task
     attributes:
       label: Task
