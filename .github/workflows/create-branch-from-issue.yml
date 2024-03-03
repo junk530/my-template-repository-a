@@ -1,0 +1,43 @@
+# This is a workflow that automatically creates a branch after creating an issue
+
+name: Create branch from issue
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  create_issue_branch_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Create branch associated with issue
+        run: |
+          # Get issue labels
+          labels=$(echo $LABELS_JSON | jq -r '.[].name')
+          echo $labels
+          # If both enhancement and bug exist, enhancement takes precedence
+          if [[ $labels == *"enhancement"* ]]; then
+            branch_prefix="feature/"
+          elif [[ $labels == *"bug"* ]]; then
+            branch_prefix="fix/"
+          else
+            branch_prefix=""
+          fi
+          branch_suffix="_#${NUMBER}"
+          # Get branch name from issue's body
+          branch_content=$(echo "$BODY" | grep -A 2 "### Branch Name" | tail -n 1)
+          branch_name=$branch_prefix$branch_content$branch_suffix
+          # Create branch associated with issue
+          gh issue develop $NUMBER --name "$branch_name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABELS_JSON: ${{ toJson(github.event.issue.labels) }}
+          NUMBER: ${{ github.event.issue.number }}
+          BODY: ${{ github.event.issue.body }}
+
