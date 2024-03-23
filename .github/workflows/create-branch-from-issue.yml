@@ -30,7 +30,7 @@ jobs:
           fi
           # Get branch name from issue's body
           branch_content=$(echo "$BODY" | grep -A 2 "### Branch Name" | tail -n 1)
-          branch_content=$(echo "${NAME}" | tr ' ' '_' | tr '[:upper:]' '[:lower:]')
+          branch_content=$(echo "${NAME}" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
           branch_name="${branch_prefix}${branch_content}-#${NUMBER}"
           # Create branch associated with issue
           echo "RUN: gh issue develop $NUMBER --name $branch_name"
