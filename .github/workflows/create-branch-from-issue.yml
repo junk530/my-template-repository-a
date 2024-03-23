@@ -40,5 +40,5 @@ jobs:
           LABELS_JSON: ${{ toJson(github.event.issue.labels) }}
           NUMBER: ${{ github.event.issue.number }}
           BODY: ${{ github.event.issue.body }}
-          NAME: ${{ github.event.issue.name }}
+          NAME: ${{ github.event.issue.title }}
 
