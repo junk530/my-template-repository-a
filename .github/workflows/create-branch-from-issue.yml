@@ -1,6 +1,6 @@
 # This is a workflow that automatically creates a branch after creating an issue
 
-name: Create branch from issue
+name: Create branch associated with issue
 
 on:
   issues:
@@ -20,7 +20,6 @@ jobs:
         run: |
           # Get issue labels
           labels=$(echo $LABELS_JSON | jq -r '.[].name')
-          echo $labels
           # If both enhancement and bug exist, enhancement takes precedence
           if [[ $labels == *"enhancement"* ]]; then
             branch_prefix="feature/"
@@ -29,15 +28,17 @@ jobs:
           else
             branch_prefix=""
           fi
-          branch_suffix="_#${NUMBER}"
           # Get branch name from issue's body
           branch_content=$(echo "$BODY" | grep -A 2 "### Branch Name" | tail -n 1)
-          branch_name=$branch_prefix$branch_content$branch_suffix
+          branch_name="${branch_prefix}${branch_content}-#${NUMBER}"
           # Create branch associated with issue
+          echo "RUN: gh issue develop $NUMBER --name $branch_name"
+          echo "${NAME}"
           gh issue develop $NUMBER --name "$branch_name"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LABELS_JSON: ${{ toJson(github.event.issue.labels) }}
           NUMBER: ${{ github.event.issue.number }}
           BODY: ${{ github.event.issue.body }}
+          NAME: ${{ github.event.issue.name }}
 
