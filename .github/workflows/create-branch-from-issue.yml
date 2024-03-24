@@ -1,5 +1,3 @@
-# This is a workflow that automatically creates a branch after creating an issue
-
 name: Create branch associated with issue
 
 on:
@@ -11,34 +9,36 @@ permissions:
   issues: write
 
 jobs:
-  create_issue_branch_job:
+  create_branch:
+    name: Create branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Create branch associated with issue
+
+      - name: Generate branch name
         run: |
           # Get issue labels
-          labels=$(echo $LABELS_JSON | jq -r '.[].name')
+          labels=$(echo ${LABELS_JSON} | jq -r '.[].name')
           # If both enhancement and bug exist, enhancement takes precedence
-          if [[ $labels == *"enhancement"* ]]; then
-            branch_prefix="feature/"
-          elif [[ $labels == *"bug"* ]]; then
-            branch_prefix="fix/"
+          if [[ ${labels} == *"enhancement"* ]]; then
+            branch_prefix="feature"
+          elif [[ ${labels} == *"bug"* ]]; then
+            branch_prefix="fix"
           else
             branch_prefix=""
           fi
-          # Get branch name from issue's body
-          branch_content=$(echo "$BODY" | grep -A 2 "### Branch Name" | tail -n 1)
-          branch_content=$(echo "${NAME}" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
-          branch_name="${branch_prefix}${branch_content}-#${NUMBER}"
-          # Create branch associated with issue
-          echo "RUN: gh issue develop $NUMBER --name $branch_name"
-          echo "${NAME}"
-          gh issue develop $NUMBER --name "$branch_name"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Get branch name from issue title
+          branch_content=$(echo "${TITLE}" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+          # Set branch name to environment variable
+          echo "branch_name=${branch_prefix}/${branch_content}-#${NUMBER}" >> $GITHUB_ENV
+        env: 
           LABELS_JSON: ${{ toJson(github.event.issue.labels) }}
           NUMBER: ${{ github.event.issue.number }}
-          BODY: ${{ github.event.issue.body }}
-          NAME: ${{ github.event.issue.title }}
+          TITLE: ${{ github.event.issue.title }}
+
+      - name: Create branch associated with issue
+          gh issue develop ${NUMBER} --name ${{ env.branch_name }}
+        env:
+          NUMBER: ${{ github.event.issue.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
