@@ -38,6 +38,7 @@ jobs:
           TITLE: ${{ github.event.issue.title }}
 
       - name: Create branch associated with issue
+        run: |
           gh issue develop ${NUMBER} --name ${{ env.branch_name }}
         env:
           NUMBER: ${{ github.event.issue.number }}
